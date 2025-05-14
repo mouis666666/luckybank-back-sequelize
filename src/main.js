@@ -9,7 +9,7 @@ configDotenv()
 
 
 // to allow who can call me using cors
-const whitelist = [process.env.FRONT_END_ORIGIN  , undefined /* to tell the cors to accept postman requests ( need to delete it after the test ) */ ]
+const whitelist = [process.env.FRONT_END_ORIGIN  , undefined , "*" /* to tell the cors to accept postman requests ( need to delete it after the test ) */ ]
 const corsOptions = {
   origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {
