@@ -50,7 +50,7 @@ const corsOptions = {
     // database
     database_connection()
 
-
+    app.get( "/test" , async (req , res ) =>{  res.send( "  hello from test " )   } )
     router_handler( app ,express )
 
 
