@@ -1,5 +1,6 @@
 {
   "name": "lucky-bank",
+  "homepage": "https://mouis666666.github.io/luckybank-back-sequelize",
   "version": "1.0.0",
   "description": "a bank system ",
   "license": "ISC",
@@ -7,7 +8,9 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon ."
+    "dev": "nodemon .",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
@@ -22,5 +25,8 @@
     "nodemailer": "^7.0.3",
     "sequelize": "^6.37.7",
     "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "gh-pages": "^6.3.0"
   }
 }
