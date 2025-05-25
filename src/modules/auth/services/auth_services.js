@@ -116,7 +116,7 @@ export const login_service = async ( req ,res  ) => { //👽
         
 
         // make the session token
-        const session_token =  await encryption( {value : uuidv4() + user.id + Date.now() , secret_key : process.env.SESSION_SECRET_KEY }) // combine with user-specific data
+        const session_token =  await encryption( {value : uuidv4() +"/"+ user.id +"/"+ Date.now() , secret_key : process.env.SESSION_SECRET_KEY }) // combine with user-specific data
 
         // make the session  
         const session_done = await Session_Model.create({ Token : session_token , Expires_at : new Date( Date.now() + 300 * 60 * 1000  ) , fk_user_id : user.id  })
@@ -128,7 +128,7 @@ export const login_service = async ( req ,res  ) => { //👽
         // make the cookies
         res.cookie("token", access_token , {
           httpOnly: true,
-        //   secure: process.env.NODE_ENV === "production", // HTTPS only in production
+        //   secure: process.env.NODE_ENV === "production", // HTTPS only in production 
           sameSite: "Strict", // CSRF protection
           maxAge: 1000 * 60 * 60 * 24, // 1 day
         });
