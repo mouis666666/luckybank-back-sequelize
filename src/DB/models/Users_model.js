@@ -3,7 +3,7 @@ import { DataTypes } from 'sequelize';
 import { SequelizeConfig } from './../connection.js';
 import { ROLE } from '../../constants/constants.js';
 import { hashSync } from 'bcrypt';
-import { decryption, encryption } from '../../utils/encryption.utils.js';
+import { encryption } from '../../utils/encryption.utils.js';
 
 
  const User_model = SequelizeConfig.define("tbl_User" , { 
@@ -67,7 +67,7 @@ import { decryption, encryption } from '../../utils/encryption.utils.js';
 
     } ,
 
-    Age : { 
+     Age : { 
         type : DataTypes.INTEGER ,
         allowNull :true ,
         validate : {
@@ -91,8 +91,13 @@ import { decryption, encryption } from '../../utils/encryption.utils.js';
         allowNull  :false ,
         defaultValue : false ,
         createdAt: DataTypes.NOW ,
-      }
+      },
 
+     isVerified: { 
+        type : DataTypes.BOOLEAN ,
+        allowNull  :false ,
+        defaultValue : false ,
+      }
 
   } ,
    { timestamps : true ,  freezeTableName : false  } )

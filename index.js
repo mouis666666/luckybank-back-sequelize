@@ -27,23 +27,36 @@ Real-time fraud detection (optional advanced) */
 
 /** ////////////////////////////////////////////////// more i can add it i the APIS
  *  🔐 Authentication & Security APIs
+ * 
 POST /auth/2fa/setup – Generate 2FA secret for TOTP (Google Authenticator)
 
 POST /auth/2fa/verify – Verify 2FA code
 
-POST /auth/refresh-token – Refresh access tokens
-
-POST /auth/change-password – Change password while logged in
-
 GET /auth/activity-log – Get recent login/IP history
 
 
+// use Cookies 
+Real life use-case:
+1. Authentication tokens
+2. Tracking user sessions
+3. Small bits of user preferences
+
+
+
+🎯 You can use TOTP for:
+Two-Factor Authentication during login.
+
+Verifying sensitive operations like money transfers.
+
+Device verification (if someone logs in from a new device).
 
 
 
 
 
 
+
+=========================================================
 
 👤 User Profile APIs
 GET /users/profile
@@ -63,6 +76,7 @@ DELETE /users/account – Deactivate/delete account (soft delete)
 
 
 
+=========================================================
 💳 Account & Banking APIs
 GET /accounts/balance-summary – Multi-account balance summary
 
@@ -82,6 +96,7 @@ POST /accounts/fund – Add money from card (simulate payment gateway)
 
 
 
+=========================================================
 
 📈 Transaction Enhancements
 GET /transactions/history – Paginated, filter by type/date
@@ -100,6 +115,7 @@ POST /transactions/tag – Tag transactions (e.g., food, bills)
 
 
 
+=========================================================
 🧠 Analytics & Insights
 GET /analytics/spending – Chart total spend per category
 
@@ -114,6 +130,7 @@ GET /analytics/top-payees – Frequently used accounts
 
 
 
+=========================================================
 🔔 Notifications
 GET /notifications
 
@@ -129,6 +146,7 @@ Real-time socket emit on new transaction or login
 
 
 
+=========================================================
 ⚙️ Admin-Specific APIs
 GET /admin/users – List all users
 
@@ -148,6 +166,7 @@ GET /admin/metrics – System-wide stats (total balance, activity)
 
 
 
+=========================================================
 
 These APIs will show that your app:
 

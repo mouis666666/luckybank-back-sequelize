@@ -13,17 +13,23 @@
     "deploy": "gh-pages -d build"
   },
   "dependencies": {
+    "@sendgrid/mail": "^8.1.5",
     "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "crypto-js": "^4.2.0",
+    "csrf": "^3.1.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "express-rate-limit": "^7.5.0",
+    "express-session": "^1.18.1",
+    "google-auth-library": "^9.15.1",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.14.1",
-    "nodemailer": "^7.0.3",
+    "qrcode": "^1.5.4",
     "sequelize": "^6.37.7",
+    "speakeasy": "^2.0.0",
     "uuid": "^11.1.0"
   },
   "devDependencies": {

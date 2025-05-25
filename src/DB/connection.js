@@ -1,7 +1,7 @@
 import { Sequelize } from "sequelize";
 
 
-export const SequelizeConfig = new Sequelize( "lucky_bank" , "root" , "" , { 
+export const SequelizeConfig = new Sequelize( "luckyBank" , "root" , "" , { 
     host : "localhost" ,
     dialect: "mysql" ,
     logging : (msg) => {  console.log( " data query is =======> " , msg );
@@ -9,9 +9,10 @@ export const SequelizeConfig = new Sequelize( "lucky_bank" , "root" , "" , {
  })
 
 
- export const database_connection = async (  ) =>{ 
+ export const database_connection = async (  ) =>{  
     try {
         await SequelizeConfig.sync( { alter : true  , force :false }  )
+        // await SequelizeConfig.authenticate() // have a problem that is not async the data if it deleted
         console.log(  "connection is success"  );
     } catch (error) {
         console.log(  "connection is failed"  , error  );
@@ -20,30 +21,8 @@ export const SequelizeConfig = new Sequelize( "lucky_bank" , "root" , "" , {
 
 
   /**
-   * Absolutely! Let’s walk through the **full cycle (flow)** of how the system works based on your ERD (Entity Relationship Diagram) for your **secure banking app**:
 
----
 
-### 🔐 **1. User Registration & Authentication**
-
-* **Users table**
-
-  * A new user signs up or logs in (via email/password or Google).
-  * Upon registration, a new record is created in the `Users` table.
-  * `google_id` is filled only if they use Google login.
-  * `role` determines access level (admin or regular user).
-
-* **Sessions table**
-
-  * When a user logs in successfully, a new token (usually JWT or session ID) is generated and stored with an `expires_at` time.
-  * This session is validated for each request to verify that the user is authenticated.
-
-* **blacklist\_token table**
-
-  * When a user logs out or forgets their password, their token or OTP is added here to **invalidate** it (especially for JWT).
-  * During login, tokens are checked against this table to prevent reuse of old/insecure tokens.
-
----
 
 ### 💰 **2. Account Management & Transactions**
 

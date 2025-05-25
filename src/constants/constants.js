@@ -18,3 +18,9 @@ export const status_transaction = {
     SUCCESS :"success",
     FAILED:"failed"
 }
+
+export const  provider = {
+    SYSTEM:"system",
+    GOOGLE : "google",
+    GMAIL : "gmail"
+} 

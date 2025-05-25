@@ -4,8 +4,10 @@ import router_handler from "./utils/router_handler.utils.js"
 import cors from "cors"
 import helmet from "helmet"
 import rateLimit from "express-rate-limit"
-import { configDotenv } from "dotenv"
-configDotenv()
+import cookieParser from "cookie-parser"
+import  dotenv  from "dotenv"
+import { validateCookies } from "./middlewares/validation_cookies_middleware.js"
+dotenv.config()
 
 
 // to allow who can call me using cors
@@ -38,26 +40,35 @@ const corsOptions = {
 
    
    //security part
-   app.disable("X-Powered-By")
    app.use(cors(corsOptions))
-   app.use(helmet({xContentTypeOptions : false , crossOriginOpenerPolicy :false }) );
+   app.use(helmet({xContentTypeOptions : false , crossOriginOpenerPolicy :true  }) );
   //  app.use(rate_limit)
 
 
    // to parse all coming data 
    app.use(express.json())
 
+   // to pase the cookies and validate it
+   app.use( cookieParser() )
+   //  app.use(validateCookies)
+
     // database
     database_connection()
 
-    app.get( "/test" , async (req , res ) =>{  res.send( "  hello from test " )   } )
-    router_handler( app ,express )
+    // test for production
+    app.get( "/test" , async (req , res,next ) =>{ if(req.params.value == "prod" ){ return next("router") }   res.status(200).json(  {message : "hello from prod test production " ,mms:req.xhr  } )    } )
+    //all the routers
+    router_handler( app ,express ) 
 
 
-    app.listen( process.env.PORT || 3000 , () =>{
-        console.log( "server is running on " , process.env.PORT     );
+    const server = app.listen( process.env.PORT || 3000 , (error) =>{
+        // console.log( "server is running on " , process.env.PORT     );
+      if (error) {
+       throw error // e.g. EADDRINUSE
+        }
+         console.log(`Listening on =========> ${JSON.stringify(server.address())}`)
         
-    }  )
+    })
 
 
 

@@ -8,19 +8,19 @@ const Session_Model = SequelizeConfig.define('tbl_Session', {
   Token: {
     type: DataTypes.STRING,
     allowNull: false,
-   //  unique: true,
-  },
+    unique :true // the problem of 'Too many keys specified; max 64 keys allowed' 
+   },
   Expires_at: {
     type: DataTypes.DATE,
     allowNull: false,
   },
 }, {
   timestamps: true, // createdAt and updatedAt
-  freezeTableName :false
+  freezeTableName :false  
 });
 
-
-User_model.hasMany(Session_Model, { foreignKey: 'fk_user_id' , onDelete: 'CASCADE ' , onUpdate: 'CASCADE ' /* mean when delete or updata make the seam in the tbl_user */ });
+//👽👽👽 // need to make devices has maxmum
+User_model.hasMany(Session_Model, { foreignKey: 'fk_user_id'  , onDelete: 'CASCADE ' , onUpdate: 'CASCADE ' /* mean when delete or updata make the seam in the tbl_user */ });
 Session_Model.belongsTo(User_model, { foreignKey: 'fk_user_id' });
 
 

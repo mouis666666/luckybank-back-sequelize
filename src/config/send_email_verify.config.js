@@ -1,45 +1,39 @@
-import nodemailer from "nodemailer"
+import sgMail from '@sendgrid/mail'
 import EventEmitter from "events"
 
-export const send_email_service = async( to , subject , html , attachments  )  => {
+export const send_email_service = async( { to , subject , html , attachments } )  => {
 
-try {
     
-    
-    const transporter = nodemailer.createTransport({
-        host : "smtp.gmail.com",
-        port : 465 ,
-        secure: true, // true for 465, false for other ports
-        auth: {
-           user: process.env.EMAIL_NAME_VERIFY,
-           pass: process.env.EMAIL_PASS_VERIFY,
-         },
-         tls:{
-            rejectUnauthorized:false
-        },
-        // connectionTimeout :  5 * 60 * 1000, 
+sgMail.setApiKey(process.env.EMAIL_PASS_KEY);
+const msg = {
+  to  ,
+  from : process.env.EMAIL_NAME_VERIFY , // Use the email address or domain you verified above
+  subject ,
+  html ,
+//   attachments   
+};
+//ES6
+sgMail
+  .send(msg)
+  .then(() => {}, error => {
+    console.error(error);
 
-    })
+    if (error.response) {
+      console.error(error.response.body);
+    }
+  });
+//ES8
+(async () => {
+  try {
+    await sgMail.send(msg);
+  } catch (error) {
+    console.error(error);
 
-
-    const info = await transporter.sendMail({
-    from: `NO_REPLY FROM ${process.env.EMAIL_NAME_VERIFY}` ,
-    to ,
-    // cc: "Lucky_bank@outlook.com" ,
-    subject,
-    html,
-    // attachments,
-
-    })
-
-    return info
-
-
-} catch (error) {
-
-    console.log( "error from send email nodemailer -==========>"    ,  error );
-    return error
-}
+    if (error.response) {
+      console.error(error.response.body)
+    }
+  }
+})();
 
 
 
