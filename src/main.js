@@ -4,9 +4,13 @@ import router_handler from "./utils/router_handler.utils.js"
 import cors from "cors"
 import helmet from "helmet"
 import rateLimit from "express-rate-limit"
-import cookieParser from "cookie-parser"
 import  dotenv  from "dotenv"
 import { validateCookies } from "./middlewares/validation_cookies_middleware.js"
+import session from "express-session";
+import cookieParser from "cookie-parser";
+import compression from "compression"
+// import csrf from "csrf-csrf";
+
 dotenv.config()
 
 
@@ -25,32 +29,53 @@ const corsOptions = {
 
 
 
+
 // // to limit much req
 // const rate_limit =  rateLimit({
-//     windowMs : 1 * 60 * 1000 , // 1 minutes
-//     limit : 10 ,
-//     message : "too many requests , please try again later " ,
-//     legacyHeaders : false
-// })
+  //     windowMs : 1 * 60 * 1000 , // 1 minutes
+  //     limit : 10 ,
+  //     message : "too many requests , please try again later " ,
+  //     legacyHeaders : false
+  // })
+  
+  
+  
+  const bootstrap = () =>{
+    const app = express()
+    
+    
+   // to parse all coming data  // and compression to increase the speed of the web app 
+   // and =>  decrease the size of the response body
+   app.use(express.json())
+   app.use(compression())
 
+   // to parse the cookies and validate it
+   app.use( cookieParser() )
+   //  app.use(validateCookies);
 
+   // make the session
+ app.use(session({
+  secret: process.env.SESSION_SECRET_KEY ,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    maxAge: 1000 * 60 * 60 // 1 hour
+  }
+}));
 
- const bootstrap = () =>{
-   const app = express()
+// csrf protection  (  you need to found a way to handle this  )
+  //  const csrfProtection = csrf({
+  //   cookie: true,
+  //   sessionKey: 'session',
+  // });
+  // app.use(csrfProtection);
 
-   
-   //security part
    app.use(cors(corsOptions))
    app.use(helmet({xContentTypeOptions : false , crossOriginOpenerPolicy :true  }) );
   //  app.use(rate_limit)
 
-
-   // to parse all coming data 
-   app.use(express.json())
-
-   // to pase the cookies and validate it
-   app.use( cookieParser() )
-   //  app.use(validateCookies)
 
     // database
     database_connection()
@@ -72,7 +97,7 @@ const corsOptions = {
 
 
 
-}
+} 
 
 
 export default bootstrap

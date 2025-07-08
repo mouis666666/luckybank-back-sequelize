@@ -6,20 +6,37 @@ import User_model from './Users_model.js';
 const Session_Model = SequelizeConfig.define('tbl_Session', {
 
   Token: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(),
     allowNull: false,
     unique :true // the problem of 'Too many keys specified; max 64 keys allowed' 
    },
+
   Expires_at: {
     type: DataTypes.DATE,
     allowNull: false,
   },
+
+    ip_address: {
+    type: DataTypes.STRING, // for tracking
+    allowNull: true,
+  },
+
+  user_agent: {
+    type: DataTypes.STRING, // e.g. browser/device info
+    allowNull: true,
+  },
+
+  is_active: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
+  }
 }, {
   timestamps: true, // createdAt and updatedAt
   freezeTableName :false  
 });
 
-//👽👽👽 // need to make devices has maxmum
+   // delete the session if has one  trigger 👽👽👽
+   
 User_model.hasMany(Session_Model, { foreignKey: 'fk_user_id'  , onDelete: 'CASCADE ' , onUpdate: 'CASCADE ' /* mean when delete or updata make the seam in the tbl_user */ });
 Session_Model.belongsTo(User_model, { foreignKey: 'fk_user_id' });
 

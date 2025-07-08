@@ -11,11 +11,11 @@ export const SequelizeConfig = new Sequelize( "luckyBank" , "root" , "" , {
 
  export const database_connection = async (  ) =>{  
     try {
-        await SequelizeConfig.sync( { alter : true  , force :false }  )
-        // await SequelizeConfig.authenticate() // have a problem that is not async the data if it deleted
+        // await SequelizeConfig.sync( { alter : true  , force :true /*  , match: /_test$/ // This will run .sync() only if database name ends with '_test' */  }  )
+        await SequelizeConfig.authenticate() // have a problem that is not async the data if it deleted
         console.log(  "connection is success"  );
     } catch (error) {
-        console.log(  "connection is failed"  , error  );
+        console.log(  "connection is failed"  , error  ); 
     }
   } 
 

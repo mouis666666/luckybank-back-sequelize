@@ -1,9 +1,10 @@
 
-import { DataTypes } from 'sequelize';
+import { DataTypes, Sequelize } from 'sequelize';
 import { SequelizeConfig } from './../connection.js';
 import { ROLE } from '../../constants/constants.js';
 import { hashSync } from 'bcrypt';
 import { encryption } from '../../utils/encryption.utils.js';
+// import sequelize from 'sqlite::memory:';
 
 
  const User_model = SequelizeConfig.define("tbl_User" , { 
@@ -39,6 +40,12 @@ import { encryption } from '../../utils/encryption.utils.js';
             isEmail : true ,
             notEmpty : false
         }
+    } ,
+
+        OTP :{
+        type : DataTypes.STRING ,
+        defaultValue : null ,
+        unique : "idx_OTP_unique",
     } ,
 
     Password : {
@@ -100,26 +107,38 @@ import { encryption } from '../../utils/encryption.utils.js';
       }
 
   } ,
-   { timestamps : true ,  freezeTableName : false  } )
+   { timestamps : true ,  freezeTableName : false , paranoid : true } )
    
 //    AccountModel.hasOne(User_model , "fk_account_id")
 //    User_model.belongsToMany(AccountModel , "fk_account_id")
 
  export default User_model
 
+ 
+
+ 
+//  console.log( User_model === sequelize.models.User_model ); // 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ////////////////////////////////////////////   ERD
 /** Users
 -----
-id (PK)
-fullName
-email (unique)
-password
-google_id (nullable)
-role (admin, user)
-created_at
-
-
 
 
 

@@ -14,9 +14,12 @@ auth_controller.post("/gmail-signup" , error_handler_middleware(auth_services.si
 auth_controller.post("/gmail-login" , error_handler_middleware(auth_services.sign_in_gmail_service) ) // under test front
 
 auth_controller.patch("/forget_pass" , error_handler_middleware(auth_services.forget_password_service) )
+auth_controller.post("/verify_forget_pass" , error_handler_middleware(auth_services.verify_forget_password_service) )
 auth_controller.put("/reset_pass" , error_handler_middleware(auth_services.reset_password_service) )
 
 auth_controller.post("/logout" , error_handler_middleware(auth_services.logout_service) )
+auth_controller.post("/logAllOut" , error_handler_middleware(auth_services.logout_all_service) )
+auth_controller.post("/logAll" , error_handler_middleware(auth_services.log_all_service) ) // should be in the user and add the access token to the header
 auth_controller.post("/delete_acc" , error_handler_middleware(auth_services.delete_account_service) )
 
 
