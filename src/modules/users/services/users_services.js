@@ -8,7 +8,39 @@ import User_model from "../../../DB/models/Users_model.js";
 
 
 
-  export const createAccount_service = async (req, res) => {
+
+export const log_all_service = async (req, res) => {//👽
+  try {
+
+    const { Email } = req.body;
+
+    // find the email
+    const user =  await User_model.findOne({ where :  { Email : Email  } })
+        if (user == null) {
+      return res.status(409).json({ message: "this email is not exist" });
+    }
+
+    // fine the session
+    const finDevice = await Session_Model.findAll({
+      where: {
+        fk_user_id: user.id 
+      },
+    });
+    
+    // case 1
+    if (finDevice.length == 0   ) {
+      return res.status(409).json({ message: "there is something went wrong please try again later" });
+    }
+
+      return res.status(201).json({ message: " log is success"  , devices : finDevice });
+  } catch (error) {
+    console.log("error in logout =============> ", error);
+    return res.status(500).json({ message: "internal server error " });
+  }
+};
+
+
+export const createAccount_service = async (req, res) => {
     const { User_id, Balance, Currency } = req.body;
   
     // if (!User_id || !Balance || !Currency) {
@@ -64,6 +96,13 @@ export const createSession_service = async (req ,res) => {
       return res.status(500).json({ message: 'Internal Server Error' });
     }
   };
+
+
+
+
+
+
+
 
 
 

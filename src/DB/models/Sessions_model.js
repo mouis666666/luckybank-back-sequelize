@@ -35,7 +35,6 @@ const Session_Model = SequelizeConfig.define('tbl_Session', {
   freezeTableName :false  
 });
 
-   // delete the session if has one  trigger 👽👽👽
    
 User_model.hasMany(Session_Model, { foreignKey: 'fk_user_id'  , onDelete: 'CASCADE ' , onUpdate: 'CASCADE ' /* mean when delete or updata make the seam in the tbl_user */ });
 Session_Model.belongsTo(User_model, { foreignKey: 'fk_user_id' });

@@ -19,7 +19,6 @@ auth_controller.put("/reset_pass" , error_handler_middleware(auth_services.reset
 
 auth_controller.post("/logout" , error_handler_middleware(auth_services.logout_service) )
 auth_controller.post("/logAllOut" , error_handler_middleware(auth_services.logout_all_service) )
-auth_controller.post("/logAll" , error_handler_middleware(auth_services.log_all_service) ) // should be in the user and add the access token to the header
 auth_controller.post("/delete_acc" , error_handler_middleware(auth_services.delete_account_service) )
 
 

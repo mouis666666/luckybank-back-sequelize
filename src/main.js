@@ -10,6 +10,8 @@ import session from "express-session";
 import cookieParser from "cookie-parser";
 import compression from "compression"
 // import csrf from "csrf-csrf";
+// import './config/trigger_session.config.js'; 
+// import "./config/trigger_black_list.config.js"
 
 dotenv.config()
 
@@ -21,7 +23,7 @@ const corsOptions = {
     if (whitelist.indexOf(origin) !== -1) {
       callback(null, true)
     } else {
-      callback(new Error('Not allowed by CORS'));
+      callback(new Error('Not allowed by CORS')); 
     }
   }
 }

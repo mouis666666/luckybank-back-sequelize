@@ -1,18 +1,20 @@
 import { DataTypes } from 'sequelize';
-import { SequelizeConfig } from '../connection';
-import User_model from './Users_model';
+import { SequelizeConfig } from '../connection.js';
+import User_model from './Users_model.js';
 
 export const BlacklistToken_Model   = SequelizeConfig.define('tbl_blacklist_token', {
-  otp: {
+  TokenId: {
     type: DataTypes.STRING,
     allowNull: false,
+    unique : "idx_TokenId_unique" , 
+
   },
   expires_at: {
     type: DataTypes.DATE,
     allowNull: false,
   },
 }, {
-  timestamps: false,
+  timestamps: true,
 });
 
 export default BlacklistToken_Model

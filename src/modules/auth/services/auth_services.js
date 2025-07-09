@@ -9,13 +9,12 @@ import { OAuth2Client } from "google-auth-library";
 import { provider } from "../../../constants/constants.js";
 import bcrypt from "bcrypt";
 import { encryption } from "../../../utils/encryption.utils.js";
+import BlacklistToken_Model from "../../../DB/models/BlackList_token_model.js";
 
 /*  🔐 Authentication & Security APIs
-POST /auth/2fa/setup – Generate 2FA secret for TOTP (Google Authenticator)
-
-POST /auth/2fa/verify – Verify 2FA code
 
 GET /auth/activity-log – Get recent login/IP history
+
 
 * **Users table**
 
@@ -26,13 +25,11 @@ GET /auth/activity-log – Get recent login/IP history
 
 * **Sessions table**
 
-  * When a user logs in successfully, a new token (usually JWT or session ID) is generated and stored with an `expires_at` time.
-  * This session is validated for each request to verify that the user is authenticated. 🐮🐮 
+  * When a user logs in successfully, a new token (usually JWT or session ID) is generated and stored with an `expires_at` time. Done
+  * This session is validated for each request to verify that the user is authenticated. 🐮🐮  done
 
 * **blacklist\_token table**
-
-  * When a user logs out or forgets their password, their token or OTP is added here to **invalidate** it (especially for JWT).
-  * During login, tokens are checked against this table to prevent reuse of old/insecure tokens.
+  * During login, tokens are checked against this table to prevent reuse of old/insecure tokens. done
 
 ---
 
@@ -92,12 +89,15 @@ export const sign_up_service = async (req, res) => {
       Password,
       rePassword,
       Age,
-    });
+    } 
+  );
+
+    const new_user = { userName : user.UserName ,  userEmail : user.Email  } 
 
     if (user) {
       return res
         .status(201)
-        .json({ message: "the user has been created", user });
+        .json({ message: "the user has been created , but need to login first ", new_user });
     } else {
       return res.status(409).json({ message: "failed to SignUp" });
     }
@@ -107,12 +107,17 @@ export const sign_up_service = async (req, res) => {
   }
 };
 
-export const login_service = async (req, res) => {//👽
+export const login_service = async (req, res) => {
   try {
     const { Email, Password } = req.body;
 
     // find email
-    const user = await User_model.findOne({ where: { Email: Email } });
+    const user = await User_model.findOne({ where: { Email: Email }  , attributes: { exclude: ["Google_Id",
+        "isDeleted",
+        "isVerified",
+        "createdAt",
+        "updatedAt",
+        "deletedAt"  ] } });
     if (user == null) {
       return res.status(409).json({ message: "this email is not exist" });
     }
@@ -141,7 +146,7 @@ export const login_service = async (req, res) => {//👽
       const oldest = existingSessions[0];
       await oldest.destroy(); // or update is_active = false
     }
-
+    
     // make the token
     const access_token = jwt.sign(
       { id: user.id, email: user.email },
@@ -187,7 +192,7 @@ export const login_service = async (req, res) => {//👽
         .json({ message: "failed to signin try again later" });
     }
 
-    // delete the black list if has one  trigger 👽👽
+    // delete the black list  trigger  has been finished >>>
 
 
 
@@ -334,6 +339,33 @@ export const sign_in_gmail_service = async (req, res) => {
         jwtid: uuidv4(),
       }
     );
+
+        // make the session token
+    const session_token = await encryption({
+        /*  👽  need to updata the data in the last of the project this is not secure 👽    */
+      value:
+        uuidv4() +
+        "/" +
+        { userId: User.id, userEmail: User.email } +
+        "/" +
+        Date.now(),
+      secret_key: process.env.SESSION_SECRET_KEY,
+    }); // combine with user-specific data
+
+        // make the session
+    const session_done = await Session_Model.create({
+      Token: session_token,
+      Expires_at: new Date(Date.now() + 300 * 60 * 1000), // five hours
+      fk_user_id: User.id,
+      ip_address: req.ip,
+      user_agent: req.headers["user-agent"],
+    });
+
+    if (!session_done) {
+      return res
+        .status(40)
+        .json({ message: "failed to signin try again later" });
+    }
 
     if (User) {
       return res
@@ -524,6 +556,9 @@ export const reset_password_service = async (req, res) => {
             html: `<hl> from your Account ${ user.Email } at lucky-bank</hl>
             <p> Your password has been changed if this is not you connect us </p>` , 
         } )
+
+       // create the black list  
+      // await BlacklistToken_Model.create({ TokenId: /* should come from the middleware auth ( the refresh and access token ) */  , expires_at: new Date() + 1000 * 60 * 60 * 24   })
       return res.status(200).json({ message: " the pass has been rested" });
     }
   } catch (error) {
@@ -561,27 +596,28 @@ export const logout_service = async (req, res) => {
     if (finDevice.length == 1 ) {
       const theOne = finDevice[0];
       await theOne.update( { is_active : false }); 
-    //   console.log( "one" );
+      //   console.log( "one" );
       
     }if(finDevice.length > 1 ) {
-
-        for (let i = 0 ; i < finDevice.length; i++){
-             const theOne = finDevice[i];
-             await theOne.update( { is_active : false }); 
-        }
-
-        //  console.log( "two" );
+      
+      for (let i = 0 ; i < finDevice.length; i++){
+        const theOne = finDevice[i];
+        await theOne.update( { is_active : false }); 
+      }
+      
+      //  console.log( "two" );
     } 
-
-
+    
+    
     // clear the cookies
     res.clearCookie("token", {
       httpOnly: true,
       //  secure: process.env.NODE_ENV === "production",
       sameSite: "Strict",
     });
-
-
+    
+      // create the black list  
+      // await BlacklistToken_Model.create({ TokenId: /* should come from the middleware auth ( the refresh and access token ) */  , expires_at: new Date() + 1000 * 60 * 60 * 24  })
       return res.status(201).json({ message: " logout is success" });
   } catch (error) {
     console.log("error in logout =============> ", error);
@@ -637,38 +673,9 @@ export const logout_all_service = async (req, res) => {
     });
 
 
+      // create the black list  
+      // await BlacklistToken_Model.create({ TokenId: /* should come from the middleware auth ( the refresh and access token ) */  , expires_at: new Date() + 1000 * 60 * 60 * 24   })
       return res.status(201).json({ message: " logout is success" });
-  } catch (error) {
-    console.log("error in logout =============> ", error);
-    return res.status(500).json({ message: "internal server error " });
-  }
-};
-
-export const log_all_service = async (req, res) => {
-  //👽
-  try {
-
-    const { Email } = req.body;
-
-    // find the email
-    const user =  await User_model.findOne({ where :  { Email : Email  } })
-        if (user == null) {
-      return res.status(409).json({ message: "this email is not exist" });
-    }
-
-    // fine the session
-    const finDevice = await Session_Model.findAll({
-      where: {
-        fk_user_id: user.id 
-      },
-    });
-    
-    // case 1
-    if (finDevice.length == 0   ) {
-      return res.status(409).json({ message: "there is something went wrong please try again later" });
-    }
-
-      return res.status(201).json({ message: " log is success"  , devices : finDevice });
   } catch (error) {
     console.log("error in logout =============> ", error);
     return res.status(500).json({ message: "internal server error " });
@@ -679,57 +686,16 @@ export const log_all_service = async (req, res) => {
 export const delete_account_service = async (req, res) => { //👽
   try {
     const { Email, Password } = req.body;
+
+
+
+
+     // create the black list  
+     // await BlacklistToken_Model.create({ TokenId: /* should come from the middleware auth ( the refresh and access token ) */  , expires_at: new Date() + 1000 * 60 * 60 * 24  })
+      return res.status(201).json({ message: " logout is success" });
   } catch (error) {
     console.log("error in deleted account =============> ", error);
     return res.status(500).json({ message: "internal server error " });
   }
 };
 
-/** //////////////////////////////////// 🌐  Main APIs
- 🔑 Auth
-
-
-
-
-
-
-👤 User & Account
-GET /users/me
-
-GET /accounts/me
-
-POST /accounts/create (create new account)
-
-GET /accounts/:id
-
-
-
-
-
-
-
-
-
-💳 Transactions
-POST /transactions/deposit
-
-POST /transactions/withdraw
-
-POST /transactions/transfer (trigger real-time update via Socket.IO)
-
-GET /transactions/history
-
-GET /transactions/:id
-
-
-
-
-
-
-
-📊 Admin-only APIs
-GET /admin/users
-
-GET /admin/transactions
-
-PATCH /admin/users/:id/block */
